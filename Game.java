@@ -1,3 +1,4 @@
+
 /**
  *  This class is the main class of the "World of Zuul" application. 
  *  "World of Zuul" is a very simple, text based adventure game.  Users 
@@ -36,9 +37,10 @@ public class Game
     {
         Room auditoriumLobby, centerWestHallway, centerEastHallway, fortGreenePlace,
              toNorthWestEntrance, toSouthWestEntrance, auditorium, toNorthEastEntrance,
-             toSouthEastEntrance, southEliot, murral;
+             toSouthEastEntrance, southEliot, murral, secretRoomBelowAuditorium;
       
         // create the rooms
+        secretRoomBelowAuditorium = new Room("secret room below the auditorium");
         auditoriumLobby = new Room("in lobby outside the auditorium");
         centerWestHallway = new Room("in the center west hallway");
         centerEastHallway = new Room("in the center east hallway");
@@ -56,7 +58,6 @@ public class Game
         auditoriumLobby.setExits(murral, centerEastHallway, auditorium, centerWestHallway);
         centerWestHallway.setExits(toNorthWestEntrance, auditoriumLobby, toSouthWestEntrance, fortGreenePlace);
         centerEastHallway.setExits(toNorthEastEntrance, southEliot, toSouthEastEntrance, auditoriumLobby);
-
         fortGreenePlace.setExits(null, centerWestHallway, null, null);
         toNorthWestEntrance.setExits(null, null, centerWestHallway, null);
         toSouthWestEntrance.setExits(centerWestHallway, null, null, null);
@@ -65,8 +66,8 @@ public class Game
         southEliot.setExits(null, centerEastHallway, null, null);
         toNorthEastEntrance.setExits(null, null, centerEastHallway, null);
         toSouthEastEntrance.setExits(centerEastHallway, null, null, null);
-        
-
+        auditorium.setExit("downstairs", secretRoomBelowAuditorium);
+        secretRoomBelowAuditorium.setExit("upstairs", auditorium);
         currentRoom = auditoriumLobby;  // start game outside
     }
 
@@ -98,21 +99,7 @@ public class Game
         System.out.println("World of Zuul is a new, incredibly boring adventure game.");
         System.out.println("Type 'help' if you need help.");
         System.out.println();
-        System.out.println("You are " + currentRoom.getDescription());
-        System.out.print("You can go: ");
-        if(currentRoom.northExit != null) {
-            System.out.print("north ");
-        }
-        if(currentRoom.eastExit != null) {
-            System.out.print("east ");
-        }
-        if(currentRoom.southExit != null) {
-            System.out.print("south ");
-        }
-        if(currentRoom.westExit != null) {
-            System.out.print("west ");
-        }
-        System.out.println();
+        printLocationInfo();
     }
 
     /**
@@ -176,16 +163,16 @@ public class Game
         // Try to leave current room.
         Room nextRoom = null;
         if(direction.equals("north")) {
-            nextRoom = currentRoom.northExit;
+            nextRoom = currentRoom.getExit("north");
         }
         if(direction.equals("east")) {
-            nextRoom = currentRoom.eastExit;
+            nextRoom = currentRoom.getExit("east");
         }
         if(direction.equals("south")) {
-            nextRoom = currentRoom.southExit;
+            nextRoom = currentRoom.getExit("south");
         }
         if(direction.equals("west")) {
-            nextRoom = currentRoom.westExit;
+            nextRoom = currentRoom.getExit("west");
         }
 
         if (nextRoom == null) {
@@ -193,21 +180,7 @@ public class Game
         }
         else {
             currentRoom = nextRoom;
-            System.out.println("You are " + currentRoom.getDescription());
-            System.out.print("Exits: ");
-            if(currentRoom.northExit != null) {
-                System.out.print("north ");
-            }
-            if(currentRoom.eastExit != null) {
-                System.out.print("east ");
-            }
-            if(currentRoom.southExit != null) {
-                System.out.print("south ");
-            }
-            if(currentRoom.westExit != null) {
-                System.out.print("west ");
-            }
-            System.out.println();
+            printLocationInfo();
         }
     }
 
@@ -225,5 +198,11 @@ public class Game
         else {
             return true;  // signal that we want to quit
         }
+    }
+    private void printLocationInfo(){
+        System.out.println("You are " + currentRoom.getDescription());
+        System.out.print("You can go: ");
+        currentRoom.getExitString();
+        System.out.println();
     }
 }
